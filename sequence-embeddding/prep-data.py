@@ -13,7 +13,7 @@ for index, row in data.iterrows():
     if not isinstance(row['opcode'], str):
         data = data.drop([index])
 
-data = data.iloc[:100]
+data = data.iloc[:1000]
 
 # method to remove operands from opcode sequence
 

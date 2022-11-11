@@ -3,7 +3,9 @@ import torch  # pytorch
 import torch.nn as nn
 from torch.autograd import Variable
 
-device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
+from copy import deepcopy
+
+device = torch.device("cuda:4" if torch.cuda.is_available() else "cpu")
 print(device)
 
 # Set Torch seet to preserve deterministic model initiation
@@ -40,7 +42,7 @@ class LSTMNet(nn.Module):
     def forward(self, x: torch.Tensor):
 
         # Embedd the input sequence
-        x = self.embeddings(x.int())
+        x = self.embeddings(x.long())
 
         h_0 = Variable(torch.zeros(self.num_layers, x.size(0),
                                    self.hidden_size))  # LSTM hidden state
@@ -74,10 +76,16 @@ class LSTM():
 
         # Init LSTM Model with provided params
         self.model = LSTMNet(vocab_size, num_classes, embd_dim,
-                             hidden_size, seq_length, num_layers)
+                             hidden_size, seq_length, num_layers).to(device)
 
         # Convert model to device, i.e. if CUDA available
         self.model.to(device)
+
+    def export(self):
+        return deepcopy(self.model.state_dict())
+
+    def load(self, params):
+        self.model.load_state_dict(deepcopy(params))
 
     def compile(self, learning_rate: float):
         '''
@@ -94,8 +102,8 @@ class LSTM():
         '''
 
         # Convert input tensors to CUDA tensors, if available
-        X.to(device)
-        y.to(device)
+        # X.to(device)
+        # y.to(device)
 
         sequence, label = X, y
 
@@ -130,7 +138,7 @@ class LSTM():
             print(f'Epoch {epoch} of {num_epochs}. Loss={loss} Acc={accuracy}',
                   end='\r')
 
-            if int(accuracy) == 1 and loss < 0.15:
+            if int(accuracy) == 1 and loss < 0.1:
                 print('\nTraining Complete!')
                 break
 
@@ -158,8 +166,8 @@ class LSTM():
         self.model.eval()
         with torch.no_grad():
             # convert to CUDA if available
-            X.to(device)
-            y.to(device)
+            # X.to(device)
+            # y.to(device)
 
             # predict the outcome
             embeddings = self.model(X)
