@@ -21,4 +21,11 @@ data = pd.DataFrame(zip(EMBEDDINGS, labels),
 
 print(data)
 
+# .merge(data, right_index=True, left_index=True)
+features = data.embeddings.apply(pd.Series)
+data = features.merge(data, right_index=True, left_index=True)
+data = data.drop(['embeddings'], axis=1)
+
+print(data)
+
 data.to_csv('./embeddings.csv', index=False)
