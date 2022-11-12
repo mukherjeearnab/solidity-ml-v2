@@ -15,7 +15,7 @@ data = pd.read_csv('./prepd-dataset.csv',
 
 data['opcode'] = data['opcode'].apply(lambda x: json.loads(x))
 
-data = data.iloc[:10]
+data = data.iloc[:]
 print(data)
 
 
@@ -30,7 +30,7 @@ def pandas2tensor(data, X=True):
 OPCODE_SEQ_LEN = 1800
 EMBEDDING_DIM = 50
 VOCAB_SIZE = 150
-NUM_EPOCHS = 128
+NUM_EPOCHS = 512
 # BATCH_SIZE = 128
 
 LEARNING_RATE = 0.001  # 0.001 lr
@@ -62,7 +62,8 @@ print("Train-Labels", train_labels.shape, type(train_labels[0]))
 for index, (sequence, label) in enumerate(zip(train_sequences, train_labels)):
     print(f'Fitting {index} of {train_sequences.shape[0]}')
 
-    model.load(model_state)
+    model = LSTM(vocab_size=VOCAB_SIZE, num_classes=NUM_CLASSES, embd_dim=EMBEDDING_DIM,
+                 hidden_size=HIDDEN_SIZE, seq_length=train_sequences.shape[1], num_layers=NUM_LAYERS)
 
     # print(model.model)
 
@@ -70,9 +71,9 @@ for index, (sequence, label) in enumerate(zip(train_sequences, train_labels)):
     model.compile(learning_rate=LEARNING_RATE)
 
     # Fit and train the RNN model with Training and Validiation Data
-    model.fit(num_epochs=NUM_EPOCHS, X=sequence, y=label)
+    model.fit(num_epochs=NUM_EPOCHS, X=sequence.to(device), y=label.to(device))
 
-    output = model.embeddings(sequence, label)
+    output = model.embeddings(sequence.to(device), label.to(device))
     with open(f'./embeddings/{index}.txt', 'w') as f:
         f.write(str(output[0].tolist()))
 

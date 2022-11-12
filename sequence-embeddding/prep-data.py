@@ -5,7 +5,7 @@ import pickle
 import pandas as pd
 
 # read the dataset
-data = pd.read_csv('http://172.16.26.217:3000/merge.csv',
+data = pd.read_csv('./merge.csv',
                    dtype={'swc_label': object, 'opcode': object})
 
 # remove corrupted data
@@ -13,7 +13,7 @@ for index, row in data.iterrows():
     if not isinstance(row['opcode'], str):
         data = data.drop([index])
 
-data = data.iloc[:1000]
+data = data.iloc[:]
 
 # method to remove operands from opcode sequence
 

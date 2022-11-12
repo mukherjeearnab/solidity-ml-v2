@@ -51,7 +51,7 @@ class LSTMNet(nn.Module):
 
         # Propagate input through LSTM
         # LSTM with input, hidden, and internal state
-        output, (hn, cn) = self.lstm(x, (h_0, c_0))
+        output, (hn, cn) = self.lstm(x, (h_0.to(device), c_0.to(device)))
 
         # Reshaping the data for Dense layer next
         hn = hn.view(-1, self.hidden_size)
